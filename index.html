@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vista Roadmap</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#D6E8F5;
+  --card:rgba(255,255,255,0.55);
+  --border:rgba(150,190,220,0.45);
+  --ink:#1a1a2e;
+  --muted:#6a7a8a;
+  --font:'Courier Prime',monospace;
+  --d:#4a7fa5;
+  --e:#4e8c65;
+  --h:#7a5a92;
+  --you:#e05c30;
+}
+html,body{
+  min-height:100vh;
+  background:var(--bg);
+  font-family:var(--font);
+  color:var(--ink);
+  overflow-x:hidden;
+}
+
+/* ── floating doodles layer ── */
+#doodle-layer{
+position:fixed;
+inset:0;
+pointer-events:none;
+z-index:0;
+overflow:hidden;
+}
+.dd{
+position:absolute;
+opacity:0;
+}
+.dd svg{fill:none;stroke:#2e5078;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ── page layout ── */
+.page{
+position:relative;
+z-index:1;
+max-width:640px;
+margin:0 auto;
+padding:2.5rem 1.2rem 6rem;
+}
+
+/* header */
+.hdr h1{font-size:27px;font-weight:700;line-height:1;}
+.hdr .sub{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(–muted);margin-top:4px;font-style:italic;}
+.hdr{margin-bottom:2.2rem;}
+
+/* ── roadmap spine ── */
+.roadmap{position:relative;padding-left:32px;}
+.spine{
+position:absolute;
+left:11px;top:0;bottom:0;
+width:2px;
+background:linear-gradient(to bottom,var(–d) 0%,var(–d) 33%,var(–e) 33%,var(–e) 66%,var(–h) 66%,var(–h) 100%);
+border-radius:2px;
+}
+
+/* phase block */
+.phase{margin-bottom:2rem;}
+.phase-label{
+position:relative;
+display:flex;align-items:center;gap:.7rem;
+margin-bottom:.9rem;
+margin-left:-32px;
+}
+.phase-dot{
+width:22px;height:22px;border-radius:50%;
+flex-shrink:0;
+border:2.5px solid #fff;
+box-shadow:0 0 0 2px currentColor;
+display:flex;align-items:center;justify-content:center;
+font-size:9px;font-weight:700;color:#fff;
+z-index:2;
+}
+.phase-title-text{
+font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+}
+.phase-sub{font-size:10px;color:var(–muted);font-style:italic;margin-top:1px;}
+
+/* milestone row */
+.milestone{
+position:relative;
+display:flex;align-items:flex-start;gap:.8rem;
+margin-bottom:.65rem;
+margin-left:-32px;
+padding:.6rem .8rem .6rem 0;
+border-radius:10px;
+transition:background .15s;
+cursor:pointer;
+}
+.milestone:hover{background:rgba(255,255,255,0.35);}
+
+.m-node{
+width:14px;height:14px;border-radius:50%;
+flex-shrink:0;margin-top:3px;
+border:2px solid currentColor;
+background:#fff;
+position:relative;z-index:2;
+transition:background .15s,transform .15s;
+display:flex;align-items:center;justify-content:center;
+}
+.milestone.done .m-node{background:currentColor;}
+.milestone.done .m-node::after{
+content:’’;width:4px;height:7px;
+border-right:1.5px solid #fff;border-bottom:1.5px solid #fff;
+transform:rotate(45deg) translate(-1px,-1px);display:block;
+}
+
+.m-body{flex:1;}
+.m-name{font-size:13px;font-weight:700;line-height:1.2;}
+.m-desc{font-size:11.5px;color:var(–muted);font-style:italic;margin-top:2px;line-height:1.4;}
+.m-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.4rem;}
+.tag{
+font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;
+padding:2px 7px;border-radius:99px;border:1px solid;
+}
+
+/* checkpoint badge */
+.checkpoint{
+position:relative;
+display:flex;align-items:flex-start;gap:.8rem;
+margin-bottom:.65rem;
+margin-left:-32px;
+padding:.65rem .8rem .65rem 0;
+border-radius:10px;
+cursor:pointer;
+}
+.checkpoint:hover{background:rgba(255,255,255,0.35);}
+.cp-node{
+width:18px;height:18px;border-radius:4px;
+flex-shrink:0;margin-top:2px;
+border:2px solid currentColor;
+background:#fff;
+position:relative;z-index:2;
+display:flex;align-items:center;justify-content:center;
+transition:background .15s;
+}
+.checkpoint.done .cp-node{background:currentColor;}
+.checkpoint.done .cp-node::after{content:‘✓’;font-size:10px;color:#fff;line-height:1;}
+.cp-label{font-size:12.5px;font-weight:700;}
+.cp-sub{font-size:11px;color:var(–muted);font-style:italic;margin-top:1px;}
+
+/* YOU ARE HERE marker */
+.yah-wrap{
+position:relative;
+margin-left:-32px;
+margin-bottom:.65rem;
+}
+.yah{
+display:inline-flex;align-items:center;gap:.5rem;
+background:var(–you);color:#fff;
+font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+padding:5px 14px 5px 8px;
+border-radius:99px;
+box-shadow:0 2px 12px rgba(224,92,48,0.35);
+animation:pulse-yah 2.5s ease-in-out infinite;
+}
+.yah-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.2s ease-in-out infinite;}
+@keyframes pulse-yah{0%,100%{box-shadow:0 2px 12px rgba(224,92,48,0.35);}50%{box-shadow:0 2px 22px rgba(224,92,48,0.6);}}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* connector line between yah and next node */
+.yah-line{
+width:2px;height:14px;
+background:var(–you);
+margin-left:10px;
+opacity:0.4;
+border-radius:2px;
+}
+
+/* legend */
+.legend{
+display:flex;flex-wrap:wrap;gap:.6rem;
+margin-top:2rem;
+padding:.8rem 1rem;
+background:var(–card);
+border:1px solid var(–border);
+border-radius:10px;
+backdrop-filter:blur(6px);
+}
+.legend-item{display:flex;align-items:center;gap:.35rem;font-size:10px;color:var(–muted);letter-spacing:.05em;text-transform:uppercase;}
+.legend-swatch{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+
+/* connector dots on spine */
+.spine-gap{height:.3rem;}
+</style>
+
+</head>
+<body>
+
+<div id="doodle-layer"></div>
+
+<div class="page">
+  <div class="hdr">
+    <h1>vista roadmap.</h1>
+    <div class="sub">UMass T.H. Chan School of Medicine · Class of 2030</div>
+  </div>
+
+  <div class="roadmap">
+    <div class="spine"></div>
+    <div id="map"></div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--you);border-radius:50%"></div>you are here</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--d)"></div>discovery</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--e)"></div>exploration</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--h)"></div>horizons</div>
+    <div class="legend-item">
+      <div style="width:12px;height:12px;border-radius:3px;border:1.5px solid #c04a4a;background:rgba(192,74,74,0.1);"></div>exam / step
+    </div>
+    <div class="legend-item">
+      <div style="width:12px;height:12px;border-radius:50%;border:1.5px solid #6a7a8a;background:#fff;"></div>unit / block
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════ ROADMAP DATA ══════════ */
+const ROADMAP = [
+  {
+    type:'phase', id:'p1', color:'var(--d)',
+    title:'① Discovery', sub:'Foundations of Medicine · Aug 2026 – Spring 2028 (~18 months)',
+  },
+  {
+    type:'milestone', id:'m1', color:'var(--d)',
+    name:'FOM1 — Molecules, Cells & Genes',
+    desc:'Cell biology, DNA, genetics, metabolism, intro pharmacology',
+    tags:['biochem','cell bio','genetics'],
+  },
+  {
+    type:'milestone', id:'m2', color:'var(--d)',
+    name:'FOM1 — Tissues & Immunity',
+    desc:'Histology, innate/adaptive immunity, inflammation, microbiology basics',
+    tags:['immunology','histo','micro'],
+  },
+  {
+    type:'milestone', id:'m3', color:'var(--d)',
+    name:'FOM1 — Cardiopulmonary',
+    desc:'Cardiac & pulmonary anatomy, hemodynamics, ECG basics, auscultation',
+    tags:['cardio','pulm','physiology'],
+  },
+  {
+    type:'milestone', id:'m4', color:'var(--d)',
+    name:'FOM1 — Renal, Endocrine & Repro',
+    desc:'Nephron physiology, hormonal axes, glucose regulation, reproductive systems',
+    tags:['renal','endo','repro'],
+  },
+  {
+    type:'milestone', id:'m5', color:'var(--d)',
+    name:'FOM1 — Neuroscience & MSK',
+    desc:'Neuroanatomy, cranial nerves, neurotransmission, muscle & bone physiology',
+    tags:['neuro','MSK','pharm'],
+  },
+  {
+    type:'milestone', id:'m6', color:'var(--d)',
+    name:'FOM1 — GI, Hepatic & Hematology',
+    desc:'GI motility, liver function, hematopoiesis, anemias, coagulation',
+    tags:['GI','heme','liver'],
+  },
+  {
+    type:'checkpoint', id:'c1', color:'#c07040',
+    name:'End-of-FOM1 Assessment',
+    sub:'Foundational science shelf · promotion to FOM2',
+  },
+  {
+    type:'milestone', id:'m7', color:'var(--d)',
+    name:'FOM2 — Cardiopulmonary Pathophysiology',
+    desc:'ACS, heart failure, arrhythmias, asthma/COPD, pneumonia, lung cancer',
+    tags:['cardio path','pulm path'],
+  },
+  {
+    type:'milestone', id:'m8', color:'var(--d)',
+    name:'FOM2 — Renal, Endocrine & Repro Pathophysiology',
+    desc:'Glomerulonephritis, CKD, thyroid/adrenal disorders, DM, OB/GYN oncology',
+    tags:['renal path','endo path'],
+  },
+  {
+    type:'milestone', id:'m9', color:'var(--d)',
+    name:'FOM2 — Neuro, Psych & MSK Pathophysiology',
+    desc:'Stroke, neurodegeneration, seizures, psychiatric pharmacology, rheumatology',
+    tags:['neuro path','psych','rheum'],
+  },
+  {
+    type:'milestone', id:'m10', color:'var(--d)',
+    name:'FOM2 — GI, Heme & Oncology Pathophysiology',
+    desc:'IBD, liver disease, hematologic malignancies, cancer biology, chemotherapy',
+    tags:['GI path','heme-onc'],
+  },
+  {
+    type:'milestone', id:'m11', color:'var(--d)',
+    name:'"Patients" — Integration Course',
+    desc:'Clinical reasoning, integrated vignettes, Step 1 strategy, timed NBMEs',
+    tags:['integration','step 1 prep'],
+  },
+  {
+    type:'checkpoint', id:'c2', color:'#c04a4a',
+    name:'USMLE Step 1',
+    sub:'Required prior to beginning Exploration Phase',
+  },
+  {
+    type:'checkpoint', id:'c3', color:'#4a7fa5',
+    name:'Transition to Core Clinical Experiences',
+    sub:'2-week hands-on simulation & orientation bridge',
+  },
+  {
+    type:'phase', id:'p2', color:'var(--e)',
+    title:'② Exploration', sub:'Core Clinical Clerkships · 2028–2029 (~18 months)',
+  },
+  {
+    type:'milestone', id:'m12', color:'var(--e)',
+    name:'Internal Medicine Clerkship',
+    desc:'H&P mastery, inpatient management, evidence-based medicine, rounds',
+    tags:['inpatient','shelf exam'],
+  },
+  {
+    type:'milestone', id:'m13', color:'var(--e)',
+    name:'Surgery Clerkship',
+    desc:'OR technique, acute abdomen, trauma basics, surgical ethics',
+    tags:['OR','shelf exam'],
+  },
+  {
+    type:'milestone', id:'m14', color:'var(--e)',
+    name:'Pediatrics Clerkship',
+    desc:'Developmental milestones, well-child, pediatric emergencies, child advocacy',
+    tags:['peds','shelf exam'],
+  },
+  {
+    type:'milestone', id:'m15', color:'var(--e)',
+    name:'OB/GYN Clerkship',
+    desc:'Labor & delivery, obstetric complications, gynecologic oncology, contraception',
+    tags:['OB/GYN','shelf exam'],
+  },
+  {
+    type:'milestone', id:'m16', color:'var(--e)',
+    name:'Psychiatry Clerkship',
+    desc:'Mental status exam, DSM-5, suicide risk, psychopharmacology, MA law',
+    tags:['psych','shelf exam'],
+  },
+  {
+    type:'milestone', id:'m17', color:'var(--e)',
+    name:'Neurology Clerkship',
+    desc:'Neuro exam, stroke protocols, epilepsy, MS, LP interpretation',
+    tags:['neuro','shelf exam'],
+  },
+  {
+    type:'milestone', id:'m18', color:'var(--e)',
+    name:'Family Medicine & Ambulatory Care',
+    desc:'Preventive care, chronic disease, motivational interviewing, health equity',
+    tags:['FM','ambulatory'],
+  },
+  {
+    type:'checkpoint', id:'c4', color:'#c04a4a',
+    name:'USMLE Step 2 CK',
+    sub:'Clinical knowledge examination',
+  },
+  {
+    type:'phase', id:'p3', color:'var(--h)',
+    title:'③ Horizons', sub:'Advanced Studies · 2029–2030 (~12 months)',
+  },
+  {
+    type:'milestone', id:'m19', color:'var(--h)',
+    name:'Sub-Internship (Acting Internship)',
+    desc:'Full intern-level patient load, cross-cover, procedural independence',
+    tags:['sub-I','AI'],
+  },
+  {
+    type:'milestone', id:'m20', color:'var(--h)',
+    name:'Emergency CPS — Critical Care',
+    desc:'ACLS, high-acuity cases, ICU management, procedural skills simulation',
+    tags:['emergency','critical care'],
+  },
+  {
+    type:'milestone', id:'m21', color:'var(--h)',
+    name:'Advanced Biomedical & Translational Sciences',
+    desc:'Clinical trial appraisal, biostatistics, genomic medicine, AI in medicine',
+    tags:['research','biostats'],
+  },
+  {
+    type:'milestone', id:'m22', color:'var(--h)',
+    name:'Electives & Away Rotations',
+    desc:'Target specialty exposure, letters of rec, personal statement drafting',
+    tags:['electives','specialty'],
+  },
+  {
+    type:'checkpoint', id:'c5', color:'#7a5a92',
+    name:'Capstone / Pathways Project Presentation',
+    sub:'Public longitudinal project defense',
+  },
+  {
+    type:'checkpoint', id:'c6', color:'#7a5a92',
+    name:'ERAS Application & Interview Season',
+    sub:'Residency applications, program interviews, rank list',
+  },
+  {
+    type:'checkpoint', id:'c7', color:'#e05c30',
+    name:'Match Day — March 2030 🎉',
+    sub:'The finish line.',
+  },
+];
+
+/* YOU ARE HERE — set to the id of whatever comes next */
+const YOU_ARE_AFTER = 'p1'; /* change this id as you progress */
+
+/* ══════════ STORE ══════════ */
+const STORE = 'vista_roadmap_v1';
+let state = {};
+function loadState(){ try{ const d=localStorage.getItem(STORE); if(d) state=JSON.parse(d); }catch(e){} }
+function saveState(){ localStorage.setItem(STORE, JSON.stringify(state)); }
+function isDone(id){ return !!state[id]; }
+function toggleDone(id){ state[id]=!state[id]; saveState(); }
+
+/* ══════════ RENDER MAP ══════════ */
+loadState();
+
+const map = document.getElementById('map');
+let yahInserted = false;
+
+ROADMAP.forEach((item, idx) => {
+  /* insert YOU ARE HERE marker before the item that follows YOU_ARE_AFTER */
+  if (!yahInserted && idx > 0 && ROADMAP[idx-1].id === YOU_ARE_AFTER) {
+    const yah = document.createElement('div');
+    yah.className = 'yah-wrap';
+    yah.innerHTML = `<div class="yah"><div class="yah-dot"></div>you are here</div><div class="yah-line"></div>`;
+    map.appendChild(yah);
+    yahInserted = true;
+  }
+
+  if (item.type === 'phase') {
+    const div = document.createElement('div');
+    div.className = 'phase';
+    div.innerHTML = `
+      <div class="phase-label">
+        <div class="phase-dot" style="background:${item.color};color:#fff;box-shadow:0 0 0 2px ${item.color}"></div>
+        <div>
+          <div class="phase-title-text" style="color:${item.color}">${item.title}</div>
+          <div class="phase-sub">${item.sub}</div>
+        </div>
+      </div>
+    `;
+    map.appendChild(div);
+
+  } else if (item.type === 'milestone') {
+    const done = isDone(item.id);
+    const div = document.createElement('div');
+    div.className = 'milestone' + (done ? ' done' : '');
+    div.style.color = item.color;
+    const tagHTML = (item.tags||[]).map(t =>
+      `<span class="tag" style="color:${item.color};border-color:${item.color};background:${item.color}18">${t}</span>`
+    ).join('');
+    div.innerHTML = `
+      <div class="m-node" style="color:${item.color}"></div>
+      <div class="m-body">
+        <div class="m-name" style="color:var(--ink)">${item.name}</div>
+        <div class="m-desc">${item.desc}</div>
+        <div class="m-tags">${tagHTML}</div>
+      </div>
+    `;
+    div.addEventListener('click', () => {
+      toggleDone(item.id);
+      div.classList.toggle('done', isDone(item.id));
+    });
+    map.appendChild(div);
+
+  } else if (item.type === 'checkpoint') {
+    const done = isDone(item.id);
+    const div = document.createElement('div');
+    div.className = 'checkpoint' + (done ? ' done' : '');
+    div.style.color = item.color;
+    div.innerHTML = `
+      <div class="cp-node" style="color:${item.color}"></div>
+      <div>
+        <div class="cp-label" style="color:${item.color}">${item.name}</div>
+        <div class="cp-sub">${item.sub}</div>
+      </div>
+    `;
+    div.addEventListener('click', () => {
+      toggleDone(item.id);
+      div.classList.toggle('done', isDone(item.id));
+    });
+    map.appendChild(div);
+  }
+});
+
+/* if YOU_ARE_AFTER is the last item */
+if (!yahInserted) {
+  const yah = document.createElement('div');
+  yah.className = 'yah-wrap';
+  yah.innerHTML = `<div class="yah"><div class="yah-dot"></div>you are here</div>`;
+  map.appendChild(yah);
+}
+
+/* ══════════ FLOATING DOODLES ══════════ */
+const DOODLES = [
+  /* stethoscope */
+  `<svg width="60" height="64" viewBox="0 0 60 64" stroke-width="1.4"><circle cx="30" cy="42" r="12"/><path d="M18 42 C18 24 10 16 10 8"/><path d="M42 42 C42 24 50 16 50 8"/><line x1="10" y1="8" x2="50" y2="8"/><circle cx="10" cy="8" r="3.5"/><circle cx="50" cy="8" r="3.5"/><circle cx="30" cy="42" r="4" fill="#2e5078" stroke="none"/></svg>`,
+  /* pill */
+  `<svg width="58" height="28" viewBox="0 0 58 28" stroke-width="1.4"><rect x="4" y="4" width="50" height="20" rx="10"/><line x1="29" y1="4" x2="29" y2="24"/></svg>`,
+  /* heart */
+  `<svg width="52" height="50" viewBox="0 0 52 50" stroke-width="1.4"><path d="M26 44 C26 44 4 30 4 18 C4 11 10 6 16 9 C20 10 24 14 26 18 C28 14 32 10 36 9 C42 6 48 11 48 18 C48 30 26 44 26 44Z"/></svg>`,
+  /* DNA */
+  `<svg width="44" height="56" viewBox="0 0 44 56" stroke-width="1.4"><path d="M12 4 C28 10 20 22 36 28 C20 34 28 46 12 52"/><path d="M32 4 C16 10 24 22 8 28 C24 34 16 46 32 52"/><line x1="15" y1="12" x2="29" y2="16"/><line x1="11" y1="28" x2="33" y2="28"/><line x1="15" y1="44" x2="29" y2="40"/></svg>`,
+  /* microscope */
+  `<svg width="52" height="60" viewBox="0 0 52 60" stroke-width="1.4"><ellipse cx="26" cy="54" rx="16" ry="4"/><line x1="26" y1="50" x2="26" y2="36"/><line x1="16" y1="36" x2="36" y2="36"/><rect x="21" y="10" width="10" height="26" rx="2"/><circle cx="26" cy="8" r="6"/><line x1="34" y1="36" x2="42" y2="44"/></svg>`,
+  /* clipboard ECG */
+  `<svg width="50" height="58" viewBox="0 0 50 58" stroke-width="1.4"><rect x="6" y="10" width="38" height="44" rx="3"/><rect x="18" y="5" width="14" height="10" rx="2"/><polyline points="10,28 16,28 20,20 24,36 28,28 34,28 38,28"/><line x1="10" y1="40" x2="40" y2="40"/><line x1="10" y1="48" x2="28" y2="48"/></svg>`,
+  /* Rx */
+  `<svg width="44" height="52" viewBox="0 0 44 52" stroke-width="1.4"><line x1="8" y1="8" x2="8" y2="44"/><path d="M8 8 C8 8 32 4 32 20 C32 32 8 30 8 30"/><line x1="22" y1="30" x2="38" y2="46"/></svg>`,
+  /* syringe */
+  `<svg width="58" height="22" viewBox="0 0 58 22" stroke-width="1.4"><rect x="12" y="7" width="34" height="8" rx="2"/><line x1="46" y1="11" x2="56" y2="11"/><polygon points="4,11 12,7 12,15"/><line x1="20" y1="7" x2="20" y2="15"/><line x1="27" y1="7" x2="27" y2="15"/><line x1="34" y1="7" x2="34" y2="15"/></svg>`,
+  /* caduceus-ish cross */
+  `<svg width="40" height="40" viewBox="0 0 40 40" stroke-width="1.4"><rect x="16" y="4" width="8" height="32" rx="2"/><rect x="4" y="16" width="32" height="8" rx="2"/></svg>`,
+];
+
+const layer = document.getElementById('doodle-layer');
+const W = window.innerWidth, H = window.innerHeight;
+
+function randomBetween(a,b){ return a + Math.random()*(b-a); }
+
+/* spawn one doodle */
+function spawnDoodle(){
+  const svg = DOODLES[Math.floor(Math.random()*DOODLES.length)];
+  const d = document.createElement('div');
+  d.className = 'dd';
+  d.innerHTML = svg;
+
+  const scale = randomBetween(0.7, 1.6);
+  const startX = randomBetween(0, W-80);
+  const startY = randomBetween(0, H-80);
+  const dur = randomBetween(18, 36); /* seconds to float */
+  const driftX = randomBetween(-120, 120);
+  const driftY = randomBetween(-140, 140);
+  const rot = randomBetween(-25, 25);
+  const fadeIn = randomBetween(0.04, 0.1);
+
+  d.style.cssText = `left:${startX}px;top:${startY}px;transform:scale(${scale}) rotate(0deg);opacity:0;`;
+
+  layer.appendChild(d);
+
+  /* animate with JS */
+  let start = null;
+  function frame(ts){
+    if(!start) start=ts;
+    const t = (ts-start)/(dur*1000); /* 0→1 */
+    if(t>=1){ layer.removeChild(d); return; }
+    const ease = t<0.15 ? t/0.15 : t>0.85 ? (1-t)/0.15 : 1;
+    const op = ease * fadeIn;
+    const x = startX + driftX*t;
+    const y = startY + driftY*t + Math.sin(t*Math.PI*3)*20;
+    const r = rot*Math.sin(t*Math.PI*2);
+    d.style.opacity = op;
+    d.style.left = x+'px';
+    d.style.top = y+'px';
+    d.style.transform = `scale(${scale}) rotate(${r}deg)`;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* spawn continuously */
+function scheduleNext(){
+  spawnDoodle();
+  setTimeout(scheduleNext, randomBetween(600, 1800));
+}
+/* initial burst */
+for(let i=0;i<10;i++) setTimeout(spawnDoodle, i*300);
+setTimeout(scheduleNext, 3200);
+</script>
+
+</body>
+</html>
